@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36717.8 d17.14
+VisualStudioVersion = 17.14.36717.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LemonChat", "LemonChat.csproj", "{9CC55F57-79B6-4D26-87B0-2B89E1BE97CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackEnd", "BackEnd\BackEnd.csproj", "{1C151344-BF42-4166-B1FA-E1F1DACDB891}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9CC55F57-79B6-4D26-87B0-2B89E1BE97CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CC55F57-79B6-4D26-87B0-2B89E1BE97CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CC55F57-79B6-4D26-87B0-2B89E1BE97CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C151344-BF42-4166-B1FA-E1F1DACDB891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C151344-BF42-4166-B1FA-E1F1DACDB891}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C151344-BF42-4166-B1FA-E1F1DACDB891}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C151344-BF42-4166-B1FA-E1F1DACDB891}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
