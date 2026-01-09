@@ -7,6 +7,16 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <StackPanel Margin="137,98,137,98">
+            <StackPanel Height="168" Width="290">
+                <Label x:Name="lbl_Mail" Content="Mail : "/>
+                <TextBox x:Name="tbx_Mail" TextWrapping="Wrap" Width="290" Height="25" BorderBrush="#FFABADB3" CaretBrush="#FF7F6E6E" Background="#FFB9B0B0" FontSize="16"/>
+                <Label x:Name="lbl_pword" Content="Password : " Margin="0,18,0,0"/>
+                <TextBox x:Name="tbx_pword" TextWrapping="Wrap" Width="290" Height="25" BorderBrush="#FFABADB3" CaretBrush="#FF7F6E6E" Background="#FFB9B0B0" FontSize="16"/>
+                <Button x:Name="btn_sumit" Content="Send" Margin="0,12,0,0" Width="100" Height="26" Click="btn_sumit_Click"/>
+            </StackPanel>
+        </StackPanel>
+        <CheckBox x:Name="chk_test" Content="Request Work" HorizontalAlignment="Center" Margin="0,280,0,0" VerticalAlignment="Top" Height="26" Width="125" IsChecked="False" FontSize="16"/>
+
     </Grid>
 </Window>

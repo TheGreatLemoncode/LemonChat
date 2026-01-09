@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BackEnd.API;
 
 namespace LemonChat
 {
@@ -23,6 +24,16 @@ namespace LemonChat
         public MainWindow()
         {
             InitializeComponent();
+            API.Initialisation();
+        }
+
+        private async void btn_sumit_Click(object sender, RoutedEventArgs e)
+        {
+            string mail = tbx_Mail.Text;
+            string password = tbx_pword.Text;
+            string display = "admin test";
+            bool ServerResponse = await API.Register(mail, display, password);
+            chk_test.IsChecked = ServerResponse;
         }
     }
 }
