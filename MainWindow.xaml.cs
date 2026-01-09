@@ -32,7 +32,7 @@ namespace LemonChat
             string mail = tbx_Mail.Text;
             string password = tbx_pword.Text;
             string display = "admin test";
-            bool ServerResponse = await API.Register(mail, display, password);
+            bool ServerResponse = await API.Registration(mail, display, password);
             chk_test.IsChecked = ServerResponse;
         }
     }
