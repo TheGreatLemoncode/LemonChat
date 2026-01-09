@@ -6,7 +6,7 @@ minute questions about design. Wish me luck.
 
 
 # 2- 2026-01-08 : First bug, Full deadlock
-Originally, i was going to code straight non-stop the easy stuff like the bones of the backend and a bit of UI. After finishing those i wanted to try the connector by simula-
+Originally, i was going to code straight non-stop the easy stuff like the bones of the backend and a bit of UI. After finishing, those i wanted to try the connector by simula
 ting an authentification to my api. During the debug, i noticed that the request would
 go to the Api but the whole client side would freeze. I spent the whole day looking into 
 it and you know what i found ? Apparently it's a common situation in wpf and .net called 
