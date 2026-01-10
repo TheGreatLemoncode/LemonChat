@@ -14,3 +14,10 @@ a Deadlock. It happen when you call an async method in a synch one and do exacly
 asyncmethod().result . It freeze the whole UI, stop exceptions from happening and cut 
 communication. The solution is to change the result and also that anywhere you call an 
 async method must be async also. That's all for this entry. From you friend the lemon.
+
+# 3- 2026-01-10 : A bit of side quests
+So i was making the code on the server side and got a sudden idea: "what if all those long
+lines get turn in functions ?". So i start to code some of them and without realising it i
+was creating a full on library to handle token creation and other security thing. It might
+take a bit more time in my planning but i have nothing better to do. End of line, this 
+project will include a python library. Yeah i know, what am i doing ?

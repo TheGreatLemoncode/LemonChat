@@ -109,8 +109,17 @@ namespace BackEnd.Connection
                 // Send the user's information to the server using the private methods HttpRequest with a POST argument
                 // Wait for the response as a Dict<string, object>. 
                 Dictionary<string, object> ServerResponse = await HttpRequest(Methods.POST, pCredential, url);
-                // Extract the token from the response and return it.
-                return ServerResponse["Token"].ToString();
+                // Since the server can ever send the token or an error message we need an if tree 
+                if(ServerResponse.TryGetValue("Token", out object Token))
+                {
+                    return Token.ToString();
+                }
+                else
+                {
+                    throw new Exception($"The server didn't respond with a token \n Message : {ServerResponse["message"]}");
+                }
+                    // Extract the token from the response and return it.
+                    return ServerResponse["Token"].ToString();
             }
 
             /// <summary>
@@ -151,7 +160,7 @@ namespace BackEnd.Connection
                         {
                             return new Dictionary<string, object>()
                             {
-                                { "error", ex.Message }
+                                { "message ", ex.Message }
                             };
                         }
                     default:

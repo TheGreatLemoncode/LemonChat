@@ -31,7 +31,7 @@ namespace BackEnd.Security
         /// </summary>
         /// <param name="pMail">the user mail</param>
         /// <param name="pDisplayName">the user display name</param>
-        /// <param name="pPassword">the user hashed password</param>
+        /// <param name="pPassword">the user clear password</param>
         /// <param name="pSalt">the salt used to hash the user password</param>
         public Credential(string pMail,  string pDisplayName, string pPassword, byte[] pSalt)
         {
