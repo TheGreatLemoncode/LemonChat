@@ -13,6 +13,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BackEnd.API;
+using ToastNotifications;
+using ToastNotifications.Messages;
+using ToastNotifications.Position;
+using ToastNotifications.Lifetime;
 
 namespace LemonChat
 {
@@ -21,19 +25,56 @@ namespace LemonChat
     /// </summary>
     public partial class MainWindow : Window
     {
+        public Notifier _notifier;
         public MainWindow()
         {
             InitializeComponent();
+            _notifier = new Notifier(cfg =>
+            {
+                cfg.PositionProvider = new WindowPositionProvider(
+                    parentWindow: Application.Current.MainWindow,
+                    corner: Corner.BottomLeft,
+                    offsetX: 10,
+                    offsetY: 10);
+
+                cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                    notificationLifetime: TimeSpan.FromSeconds(2),
+                    maximumNotificationCount: MaximumNotificationCount.FromCount(2));
+
+                cfg.Dispatcher = Application.Current.Dispatcher;
+            });
             API.Initialisation();
         }
 
-        private async void btn_sumit_Click(object sender, RoutedEventArgs e)
+        private void Window_Closed(object sender, EventArgs e)
         {
-            string mail = tbx_Mail.Text;
-            string password = tbx_pword.Text;
-            string display = "admin test";
-            bool ServerResponse = await API.Registration(mail, display, password);
-            chk_test.IsChecked = ServerResponse;
+            _notifier.Dispose();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadWelcome();
+        }
+
+        private void Show_connexion_click(object sender, RoutedEventArgs e)
+        {
+            Display.Content = new View.Connexion();
+        }
+
+        private void Show_registration_click(object sender, RoutedEventArgs e)
+        {
+            Display.Content = new View.AccountCreation();
+        }
+
+        private void LoadWelcome()
+        {
+            MessageBox.Show(Application.Current.MainWindow, "Welcome in LemonChat", "LemonChat");
+        }
+
+        private bool LoadRegistration()
+        {
+            return true;
+        }
+
     }
 }

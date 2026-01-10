@@ -4,48 +4,65 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackEnd
+namespace BackEnd.User
 {
-    internal class Person
+    public class Person
     {
-        private Guid UserId;
         private string Name;
-        private List<Person> Friends;
+        private List<Person> Contacts;
 
         public Person()
         {
-            UserId = Guid.NewGuid();
-            Friends = new List<Person>();
+            Contacts = new List<Person>();
         }
 
         public Person(string pName)
         {
-            UserId= Guid.NewGuid();
             Name = pName;
-            Friends = new List<Person>();
+            Contacts = new List<Person>();
+        }
+
+        /// <summary>
+        /// Allow the creation of a Person instance using a credential instance
+        /// </summary>
+        /// <param name="pCredential"></param>
+        public Person(Security.Credential pCredential)
+        {
+            Name = pCredential.DisplayName;
+            Contacts = new List<Person>();
+        }
+
+        public void AddFriends(List<Person> pListe)
+        {
+            foreach(Person p in pListe)
+            {
+                this.AddFriend(p);
+            }
         }
 
         public bool AddFriend(Person pPerson)
         {
-            if (Friends.Contains(pPerson))
+            if (Contacts.Contains(pPerson))
             {
                 return false;
             }
-            Friends.Add(pPerson);
+            Contacts.Add(pPerson);
             return true;
         }
 
-        public bool RemoveFriend(Guid PersonId)
+        public bool RemoveContact(Person pContact)
         {
-            foreach (Person pPerson in Friends)
+            if (!Contacts.Contains(pContact))
             {
-                if(pPerson.UserId == PersonId)
-                {
-                    Friends.Remove(pPerson);
-                    return true;
-                }
+                return false;
             }
-            return false;
+            Contacts.Remove(pContact);
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

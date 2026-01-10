@@ -13,17 +13,7 @@ namespace BackEnd.Security
     {
         public string Mail;
         public string DisplayName;
-        public string UserId;
         public string Password;
-        public byte[] Salt;
-
-        /// <summary>
-        /// Initialize an empty instance of the credential class to be used as a wrapper
-        /// </summary>
-        public Credential()
-        {
-            Salt = new byte[16];
-        }
 
         /// <summary>
         /// Initialize an instance of the credential class with all parameters except the Guid. Use for
@@ -32,14 +22,11 @@ namespace BackEnd.Security
         /// <param name="pMail">the user mail</param>
         /// <param name="pDisplayName">the user display name</param>
         /// <param name="pPassword">the user clear password</param>
-        /// <param name="pSalt">the salt used to hash the user password</param>
-        public Credential(string pMail,  string pDisplayName, string pPassword, byte[] pSalt)
+        public Credential(string pMail,  string pDisplayName, string pPassword)
         {
             Mail = pMail.Trim();
             DisplayName = pDisplayName;
             Password = pPassword;
-            Salt = pSalt;
-            UserId = Guid.NewGuid().ToString();
         }
 
         /// <summary>

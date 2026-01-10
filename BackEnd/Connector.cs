@@ -1,4 +1,5 @@
 ﻿using BackEnd.Security;
+using BackEnd.User;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,19 +11,11 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using static System.Net.WebRequestMethods;
 
 namespace BackEnd.Connection
 {
-    /// <summary>
-    /// Enum that represent the http request type
-    /// </summary>
-    public enum Methods
-    {
-        POST,
-        GET
-    }
-
     /// <summary>
     /// Class that handle all network related request. It can send http and WebSocket requests
     /// </summary>
@@ -32,6 +25,11 @@ namespace BackEnd.Connection
         private HTTP _httpClient;
         // private jwt token sent by the server after authentification (HTTP handshake)
         private string _token;
+        // private bool that indicated if the initial hand check with the server happened and
+        // and that the user has a token 
+        private bool _authenticated = default;
+        // private string that server as buffer to hold message for API
+        private Queue<string> Messages;
 
         /// <summary>
         /// Class constructor. Initialize all parameters (HTTP, WebSocket etc..)
@@ -39,38 +37,103 @@ namespace BackEnd.Connection
         public Connector()
         {
             _httpClient = new HTTP();
+            _authenticated = false;
+            Messages = new Queue<string>();
+        }
+
+        public bool IsAuthentified
+        {
+            get
+            {
+                return _authenticated;
+            }
+        }
+
+        public string message
+        {
+            get
+            {
+                if(Messages.Count == 0)
+                {
+                    return string.Empty;
+                }
+                return Messages.Dequeue();
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    Messages.Enqueue(value);
+                }
+            }   
         }
 
         /// <summary>
         /// Method that handle the user authentification. It send the information wrap in 
         /// the credential class to the server and wait for his response in the form of a bool.
+        /// 
         /// </summary>
         /// <param name="pCredential"></param>
         /// <returns>The server authentification response as a boolean</returns>
-        public async Task<bool> Authentification(Credential pCredential)
+        public async Task Authentification(Credential pCredential, HandShake pType)
         {
             // Check if the HttpClient is not null
             if(_httpClient is null)
             {
-                return false;
+                return;
             }
             // Check if the user already has a token
             if (!string.IsNullOrEmpty(_token))
             {
-                return true;
+                return;
             }
-            // Give the information to the HTTP class and wait for the server response that is the token
-            string Token = await _httpClient.RegistrationHandShake(pCredential);
-            // if the response is null or empty, this mean there is an error somewhere and return false
-            if (string.IsNullOrEmpty(Token))
+
+
+            // dictionary to hold the future server response
+            Dictionary<string, object> response = await _httpClient.ServerHandShake(pCredential, pType);
+
+            // we check the code of the server to know if the token is created
+            int code = int.Parse(response["Code"].ToString());
+            switch (code)
             {
-                return false;
+                case 30:
+                     string token = response["Content"].ToString();
+                    _token = token;
+                    message = "Connection successful";
+                    _authenticated = true;
+                    _httpClient.SetHeader(_token);
+                    break;
+                case 35:
+                    _authenticated = false;
+                    message = response["Content"].ToString();
+                    break;
+                
             }
-            // Give the token to the connector to be used in future communication with the server then return 
-            // true
-            _token = Token;
-            return true;
         } 
+
+        //public async Task<List<Person>> GetUserData(Data pDataType)
+        //{
+        //    // Check if the HttpClient is not null
+        //    if (_httpClient is null)
+        //    {
+        //        return new List<Person>();
+        //    }
+        //    // Check if the user already has a token
+        //    if (!string.IsNullOrEmpty(_token))
+        //    {
+        //        return new List<Person>();
+        //    }
+        //    Dictionary<string, object> response = new Dictionary<string, object>();
+
+        //    switch (pDataType)
+        //    {
+        //        case Data.FRIENDS:
+        //            response = await _httpClient.UserFriends();
+        //            break;
+        //    }
+        //}
+
+        
 
         /// <summary>
         /// Private class to the Connector. His role is to handle all http communication with the server. It contains 
@@ -88,7 +151,21 @@ namespace BackEnd.Connection
             public HTTP()
             {
                 _client = new HttpClient();
-                _client.Timeout = TimeSpan.FromSeconds(7);
+                _client.Timeout = TimeSpan.FromSeconds(20);
+            }
+
+            public bool SetHeader(string pToken)
+            {
+                _client.DefaultRequestHeaders.Add("tk",  pToken);
+                return true;
+            }
+
+            public async Task<Dictionary<string,object>> UserFriends()
+            {
+                string URL = "http://127.0.0.1/Friends";
+                string n = string.Empty;
+                Dictionary<string, object> data = await HttpRequest(Methods.GET, n, URL);
+                return data;
             }
 
             /// <summary>
@@ -97,7 +174,7 @@ namespace BackEnd.Connection
             /// </summary>
             /// <param name="pCredential">User's information wrap in the credential class</param>
             /// <returns>string that represent the jwt token from the server or an error message</returns>
-            public async Task<string> RegistrationHandShake(Credential pCredential)
+            public async Task<Dictionary<string,object>> ServerHandShake(Credential pCredential, HandShake pType)
             {
                 // check is the HttpClient is not null
                 if (_client == null)
@@ -105,21 +182,28 @@ namespace BackEnd.Connection
                     return null;
                 }
                 // url to the server
-                string url = "http://127.0.0.1:50000/register";
-                // Send the user's information to the server using the private methods HttpRequest with a POST argument
-                // Wait for the response as a Dict<string, object>. 
-                Dictionary<string, object> ServerResponse = await HttpRequest(Methods.POST, pCredential, url);
-                // Since the server can ever send the token or an error message we need an if tree 
-                if(ServerResponse.TryGetValue("Token", out object Token))
+                string url = "http://127.0.0.1:50000/";
+                Dictionary<string, object> ServerResponse = new Dictionary<string, object>();
+
+                switch (pType)
                 {
-                    return Token.ToString();
+                    case HandShake.REGISTRATION:
+                        // Send the user's information to the server using the private methods HttpRequest with a POST argument
+                        // Wait for the response as a Dict<string, object>. 
+                        url = url + "register";
+                        ServerResponse = await HttpRequest(Methods.POST, pCredential, url);
+                        return ServerResponse;
+
+                    case HandShake.CONNEXION:
+                        // Send the user's information to the server using the private methods HttpRequest with a POST argument
+                        // Wait for the response as a Dict<string, object>. 
+                        url = url + "connexion";
+                        ServerResponse = await HttpRequest(Methods.POST, pCredential, url);
+                        return ServerResponse;
+                    default:
+                        return ServerResponse;
                 }
-                else
-                {
-                    throw new Exception($"The server didn't respond with a token \n Message : {ServerResponse["message"]}");
-                }
-                    // Extract the token from the response and return it.
-                    return ServerResponse["Token"].ToString();
+                
             }
 
             /// <summary>
@@ -160,52 +244,14 @@ namespace BackEnd.Connection
                         {
                             return new Dictionary<string, object>()
                             {
-                                { "message ", ex.Message }
+                                { "Message ", ex.Message },
+                                {"Code", 100}
                             };
                         }
                     default:
                         throw new Exception("Method not supported. Use Methods.GET or Methods.POST");
                 }
             }
-
-            /// <summary>
-            /// Private method that can send and receive data from the server with an authentification token and return it's response. It can POST and GET 
-            /// depending of the given argument. Use only to communicate with endpoint that require authentification
-            /// </summary>
-            /// <param name="pMethod">An enum that represent the http request type to be execute</param>
-            /// <param name="pData">The data to be send to the server</param>
-            /// <param name="url">Destination url to the server in string</param>
-            /// <param name="pToken">string that represent the user jwt token</param>
-            /// <returns>A dictionary that contains the response from the server</returns>
-            /// <exception cref="Exception"></exception>
-            private async Task<Dictionary<string, object>> HttpRequest(Methods pMethod, object pData,string pToken, string url = BaseUrl)
-            {
-                switch (pMethod)
-                {
-                    case Methods.POST:
-                        string json = JsonConvert.SerializeObject(pData);
-                        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-                        content.Headers.Add("token", pToken);
-                        HttpResponseMessage MessageResponse = await _client.PostAsync(url, content);
-                        try
-                        {
-                            MessageResponse.EnsureSuccessStatusCode();
-                            string JsonResponse = await MessageResponse.Content.ReadAsStringAsync();
-                            return JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonResponse);
-                        }
-                        catch (Exception ex)
-                        {
-                            return new Dictionary<string, object>()
-                            {
-                                { "error", ex.Message }
-                            };
-                        }
-                    default:
-                        throw new Exception("Method not supported. Use Methods.GET or Methods.POST");
-                }
-            }
-
-
         }
 
         //private class Websocket

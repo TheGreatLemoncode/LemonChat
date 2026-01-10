@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="API.cs" />
     <Compile Include="Connector.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Security\Credential.cs" />
     <Compile Include="Security\Kitchen.cs" />

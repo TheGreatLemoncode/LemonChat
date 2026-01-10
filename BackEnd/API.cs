@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using BackEnd.Connection;
+using BackEnd.User;
 
 namespace BackEnd.API
 {
@@ -18,6 +19,8 @@ namespace BackEnd.API
         private static RandomNumberGenerator rng = RandomNumberGenerator.Create();
         // private instance of the connector class use to handle all communication with the server
         private static Connector Connection;
+        // a private instance of the current connected user
+        public static Person _user;
 
         /// <summary>
         /// Initialize all component in the API class (connector etc...) 
@@ -28,32 +31,55 @@ namespace BackEnd.API
         }
 
         /// <summary>
-        /// API method that handle the user account creation. It take the user info, hash the password and send
-        /// to the server using the connector. Return true if the connection is successful and false otherwise 
+        /// API method that handle the user account creation. It take the user information and send them
+        /// to the server using the connector.
         /// </summary>
         /// <param name="pMail">string that represent the user's mail</param>
         /// <param name="pDisplay">string that represent the user's display name to the other users</param>
         /// <param name="pPassword">string that represent the user's hashed password</param>
-        /// <returns>Boolean that represent the connection status</returns>
-        public async static Task<bool> Registration(string pMail, string pDisplay, string pPassword)
+        /// <returns>An empty task object</returns>
+        public async static Task Registration(string pMail, string pDisplay, string pPassword)
         {
-            // Wrap the informations an instance of the credential class  
-            Credential UserCredential = new Credential(pMail, pDisplay, pPassword, CreateSalt());
+            // Wrap the informations in an instance of the credential class  
+            Credential UserCredential = new Credential(pMail, pDisplay, pPassword);
             // Send the information to the server using the connector and wait for his response
-            bool response = await Connection.Authentification(UserCredential);
-            // return the awaited response
-            return response;
+            await Connection.Authentification(UserCredential, HandShake.REGISTRATION);
+            // We check if the authentification is correct then create a user for the frontend to use
+            if (ClientStatus())
+            {
+                _user = new Person(UserCredential);
+                _user.AddFriends(await GetFriendsFromServer());
+            }
+            //  
         }
 
-        /// <summary>
-        /// Private method that create a 16 bytes salt to hash password
-        /// </summary>
-        /// <returns>An array of bytes of size 16 </returns>
-        private static byte[] CreateSalt()
+        public async static Task Connexion(string pMail, string pPassword)
         {
-            byte[] buffer = new byte[16];
-            rng.GetBytes(buffer);
-            return buffer;
+            // We wrap the information in an instance of the credential class
+            Credential UserCredential = new Credential(pMail, pPassword);
+            // We send the information to the server using the connector
+            await Connection.Authentification(UserCredential, HandShake.CONNEXION);
+            if (ClientStatus())
+            {
+                _user = new Person(UserCredential);
+                _user.AddFriends(await GetFriendsFromServer());
+            }
         }
+
+        private async static Task<List<Person>> GetFriendsFromServer()
+        {
+            return new List<Person>();
+        }
+
+        public static string GetMessageFromServer()
+        {
+            return Connection.message;
+        }
+
+        public static bool ClientStatus()
+        {
+            return Connection.IsAuthentified;
+        }
+
     }
 }

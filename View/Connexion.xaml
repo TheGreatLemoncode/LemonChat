@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="LemonChat.View.Connexion"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LemonChat.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="401" d:DesignWidth="547">
+    <Grid>
+        <StackPanel x:Name="stk_connexion" HorizontalAlignment="Center" Margin="0,46,0,46" Width="364">
+            <Label Content="Connexion" x:Name="lbl_connexion" FontSize="36"  HorizontalContentAlignment="Center" Height="47" Width="211" FontFamily="Arial Rounded MT Bold"/>
+            <Label x:Name="lbl_mail" Content="Mail" FontSize="18" Padding="5,5,5,5" Margin="0,18,0,0" />
+            <TextBox x:Name="txtBox_mail" Text="" Margin="0,10,0,0" FontSize="18"/>
+            <Label x:Name="lbl_Password" Content="Password" FontSize="18" Padding="5,5,5,5" Margin="0,18,0,0" />
+            <TextBox x:Name="txtBox_Password" Text="" Margin="0,10,0,0" FontSize="18"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0" Height="93">
+                <Button x:Name="btn_submit" Content="Submit" Margin="10,20,10,10" Height="50" Width="100" Click="Connexion_click"/>
+                <Button x:Name="btn_reset" Content="Reset" Margin="0,20,10,10" Height="50" Width="100" Click="Reset_click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

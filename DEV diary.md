@@ -21,3 +21,12 @@ lines get turn in functions ?". So i start to code some of them and without real
 was creating a full on library to handle token creation and other security thing. It might
 take a bit more time in my planning but i have nothing better to do. End of line, this 
 project will include a python library. Yeah i know, what am i doing ?
+
+# 4- 2026-01-13 : Creation of a new set of communication codes
+Some time ago, I thought of a problem: “What if the server doesn’t send back the token during 
+the authentication step, but instead sends a message indicating whether the user is already in
+the database?” (yeah, I overthink a lot).So I decided to completely change how the server 
+communicates. Now, the server only sends back Content and a Code that tells the client how it
+should behave. To do this, I had to change the client so that it never knows what’s coming, 
+but knows there will always be a code to guide it. It only took me three days of straight 
+bed-rotting and doom-scrolling to reach this conclusion lol.
