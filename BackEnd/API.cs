@@ -44,13 +44,6 @@ namespace BackEnd.API
             Credential UserCredential = new Credential(pMail, pDisplay, pPassword);
             // Send the information to the server using the connector and wait for his response
             await Connection.Authentification(UserCredential, HandShake.REGISTRATION);
-            // We check if the authentification is correct then create a user for the frontend to use
-            if (ClientStatus())
-            {
-                _user = new Person(UserCredential);
-                _user.AddFriends(await GetFriendsFromServer());
-            }
-            //  
         }
 
         public async static Task Connexion(string pMail, string pPassword)
@@ -59,11 +52,6 @@ namespace BackEnd.API
             Credential UserCredential = new Credential(pMail, pPassword);
             // We send the information to the server using the connector
             await Connection.Authentification(UserCredential, HandShake.CONNEXION);
-            if (ClientStatus())
-            {
-                _user = new Person(UserCredential);
-                _user.AddFriends(await GetFriendsFromServer());
-            }
         }
 
         private async static Task<List<Person>> GetFriendsFromServer()
@@ -78,7 +66,7 @@ namespace BackEnd.API
 
         public static bool ClientStatus()
         {
-            return Connection.IsAuthentified;
+            return (Connection.IsAuthentified && !(_user is null));
         }
 
     }

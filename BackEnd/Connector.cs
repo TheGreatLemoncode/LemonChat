@@ -1,4 +1,5 @@
 ﻿using BackEnd.Security;
+using BackEnd.API;
 using BackEnd.User;
 using Newtonsoft.Json;
 using System;
@@ -97,11 +98,12 @@ namespace BackEnd.Connection
             switch (code)
             {
                 case 30:
-                     string token = response["Content"].ToString();
+                    string token = response["Token"].ToString();
                     _token = token;
                     message = "Connection successful";
                     _authenticated = true;
                     _httpClient.SetHeader(_token);
+                    API.API._user = new Person(response["Content"].ToString());
                     break;
                 case 35:
                     _authenticated = false;
@@ -109,7 +111,8 @@ namespace BackEnd.Connection
                     break;
                 
             }
-        } 
+        }
+
 
         //public async Task<List<Person>> GetUserData(Data pDataType)
         //{
@@ -238,13 +241,18 @@ namespace BackEnd.Connection
                             MessageResponse.EnsureSuccessStatusCode();
                             // If it's all right, we read the content of the response, deserialize and then return it.
                             string JsonResponse = await MessageResponse.Content.ReadAsStringAsync();
-                            return JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonResponse);
+                            Dictionary<string, object> nResponse = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonResponse);
+                            if(MessageResponse.Headers.TryGetValues("tk", out IEnumerable<string> token)){
+                                nResponse.Add("Token", token);
+                            }
+                            
+                                return nResponse;
                         }
                         catch (Exception ex)
                         {
                             return new Dictionary<string, object>()
                             {
-                                { "Message ", ex.Message },
+                                { "Content ", ex.Message },
                                 {"Code", 100}
                             };
                         }

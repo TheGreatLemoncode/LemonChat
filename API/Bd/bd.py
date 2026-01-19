@@ -50,9 +50,6 @@ def get_curseur(self):
 
 def add_user(password_hash, mail, name, salt : str):
     """Ajoute un utilisateur à la BD"""
-    if not get_user(mail):
-        return False
-
     with creer_connexion() as conn:
         with conn.get_curseur() as curseur:
             sql = "INSERT INTO user (mail, name, password) VALUES (%s, %s, %s)"
@@ -70,19 +67,19 @@ def __add_salt_to_user(user_mail : str, user_salt : str) -> bool:
             print(f"salt of user {user_mail} added to the database.")
             return bool(curseur.rowcount > 0)
 
-def get_user(user_mail: str) -> dict:
+def get_user(user_mail: str):
     """Return the user information in the database with the given mail"""
     with creer_connexion() as conn:
         with conn.get_curseur() as curseur:
             sql = "SELECT * FROM user WHERE user.mail = %s"
-            curseur.execute(sql,(user_mail))
+            curseur.execute(sql, (user_mail,))
             return curseur.fetchone()
         
 def get_salt(user_mail: str) -> str:
     """Return the salt of the user with the given mail"""
     with creer_connexion() as conn:
         with conn.get_curseur() as curseur:
-            sql = "SELECT salt.value FROM salt WHERE salt.mail = (SELECT mail FROM user where user.mail = %s)"
-            curseur.execute(sql,(user_mail))
+            sql = "SELECT salt.value FROM salt WHERE salt.mail = (SELECT mail FROM user where user.mail = %(mail)s)"
+            curseur.execute(sql,{"mail" : user_mail})
             data = curseur.fetchone()
             return data['value']

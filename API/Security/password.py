@@ -1,4 +1,5 @@
 import hashlib, os
+from hmac import compare_digest
 import Bd
 
 __ALL__ = [
@@ -8,15 +9,17 @@ __ALL__ = [
 ]
 
 
-def hash_password(Password: bytes, salt : bytes) -> str:
+def hash_password(Password: bytes, Salt : bytes) -> str:
     """hash a clear password a return it plus the salt used"""
-    hashed = hashlib.scrypt(password=Password, salt=salt, p=8, dklen= 64, n=16384, r=8)
+    hashed = hashlib.scrypt(password=Password, salt=Salt, p=8, dklen= 64, n=16384, r=8)
     return hashed.hex()
 
 def __compare_hash_clear(clear: str, salt: str, hashed : str) -> bool:
     """Compare the clear password with the hash using a salt"""
-    new_hash = hash_password(clear.encode("utf-8"), salt.encode("utf-8"))
-    return bool(new_hash == hashed)
+    b_hashed = bytes.fromhex(hashed)
+    b_salts = bytes.fromhex(salt)
+    new_hash = hash_password(bytes(clear, 'utf-8'), b_salts)
+    return compare_digest(bytes.fromhex(new_hash), b_hashed)
 
 def user_connexion(mail: str, password:str) -> bool:
     """

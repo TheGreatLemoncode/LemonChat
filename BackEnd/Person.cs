@@ -8,7 +8,7 @@ namespace BackEnd.User
 {
     public class Person
     {
-        private string Name;
+        private string _name;
         private List<Person> Contacts;
 
         public Person()
@@ -18,7 +18,7 @@ namespace BackEnd.User
 
         public Person(string pName)
         {
-            Name = pName;
+            _name = pName;
             Contacts = new List<Person>();
         }
 
@@ -28,7 +28,7 @@ namespace BackEnd.User
         /// <param name="pCredential"></param>
         public Person(Security.Credential pCredential)
         {
-            Name = pCredential.DisplayName;
+            _name = pCredential.DisplayName;
             Contacts = new List<Person>();
         }
 
@@ -62,7 +62,7 @@ namespace BackEnd.User
 
         public override string ToString()
         {
-            return Name;
+            return _name;
         }
     }
 }

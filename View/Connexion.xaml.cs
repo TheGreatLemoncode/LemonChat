@@ -38,7 +38,7 @@ namespace LemonChat.View
         {
             if (string.IsNullOrEmpty(txtBox_mail.Text) || string.IsNullOrEmpty(txtBox_Password.Text))
             {
-                MessageBox.Show("un des champs est vide");
+                MessageBox.Show("Un des champs est vide");
             }
             else
             {
