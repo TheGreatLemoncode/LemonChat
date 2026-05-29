@@ -74,12 +74,13 @@ def get_user(user_mail: str):
             sql = "SELECT * FROM user WHERE user.mail = %s"
             curseur.execute(sql, (user_mail,))
             return curseur.fetchone()
-        
+
 def get_salt(user_mail: str) -> str:
     """Return the salt of the user with the given mail"""
     with creer_connexion() as conn:
         with conn.get_curseur() as curseur:
-            sql = "SELECT salt.value FROM salt WHERE salt.mail = (SELECT mail FROM user where user.mail = %(mail)s)"
+            sql = "SELECT salt.value FROM salt WHERE salt.mail " \
+            "= (SELECT mail FROM user where user.mail = %(mail)s)"
             curseur.execute(sql,{"mail" : user_mail})
             data = curseur.fetchone()
             return data['value']

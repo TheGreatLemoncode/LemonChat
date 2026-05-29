@@ -1,6 +1,5 @@
-
 import json
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, Response
 from datetime import datetime, timedelta, timezone
 import Security
 import Bd
@@ -35,14 +34,15 @@ def register():
         creation = int(now.timestamp())
         exp = int( (now + timedelta(hours=5)) .timestamp())
         # we initialize a payload to be turn into a token
-        payload = {"Role" : "user", "iss" : "API.me", "sub" : 
+        payload = {"Role" : "user", "iss" : "API.me", "sub" :
                    usercredential.get("Mail"), "aud" : "chat-service",
                    "iat" : creation, "exp" : exp}
         token = Security.create_jwt_token(payload)
         # with our token created we can create a response for the user
         response["Content"] = usercredential['DisplayName']
         response["Code"] = 30
-        return Response(json.dumps(response), status=200, mimetype="application/json", headers={'tk': token})
+        return Response(json.dumps(response), status=200,
+                        mimetype="application/json", headers={'tk': token})
 
     # In the case that the user is already in our database, we return
     # just a message to inform him to use the login option
@@ -70,7 +70,8 @@ def connexion():
         # we get the user in the database
         user = Bd.get_user(user_mail)
         response = {"Content" : user['mail'], "Code" : 30}
-        return Response(json.dumps(response), 200, mimetype="application/json", headers={'tk' : token})
+        return Response(json.dumps(response), 200,
+                        mimetype="application/json", headers={'tk' : token})
     response = {"Content" : "Connexion refused", "Code" : 35}
     return Response(json.dumps(response), 200, mimetype="application/json")
 
