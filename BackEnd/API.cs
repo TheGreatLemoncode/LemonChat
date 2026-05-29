@@ -15,12 +15,13 @@ namespace BackEnd.API
     /// </summary>
     public static class API
     {
-        // private random number generator use to create salts
-        private static RandomNumberGenerator rng = RandomNumberGenerator.Create();
+
         // private instance of the connector class use to handle all communication with the server
         private static Connector Connection;
         // a private instance of the current connected user
         public static Person _user;
+        // public delegate for the notifier
+        public static event EventHandler NotificationEvent;
 
         /// <summary>
         /// Initialize all component in the API class (connector etc...) 
@@ -28,6 +29,7 @@ namespace BackEnd.API
         public static void Initialisation()
         {
             Connection = new Connector();
+            Connection.NewMessage += NewMessageEvent;
         }
 
         /// <summary>
@@ -54,11 +56,11 @@ namespace BackEnd.API
             await Connection.Authentification(UserCredential, HandShake.CONNEXION);
         }
 
-        private async static Task<List<Person>> GetFriendsFromServer()
-        {
-            return new List<Person>();
-        }
-
+        /// <summary>
+        /// public static method that return the latest message from
+        /// the server and shows it as notification
+        /// </summary>
+        /// <returns>A string message from the server</returns>
         public static string GetMessageFromServer()
         {
             return Connection.message;
@@ -69,5 +71,15 @@ namespace BackEnd.API
             return (Connection.IsAuthentified && !(_user is null));
         }
 
+        /// <summary>
+        /// A public static event type method that is raised when a new message 
+        /// arrives from the server. Serves as bridge for the front and backend
+        /// </summary>
+        /// <param name="sender">The instance that raised this event</param>
+        /// <param name="args">The argument that was use to raise the event </param>
+        public static void NewMessageEvent(object sender, EventArgs args)
+        {
+            NotificationEvent?.Invoke(sender, args);
+        }
     }
 }

@@ -31,6 +31,8 @@ namespace BackEnd.Connection
         private bool _authenticated = default;
         // private string that server as buffer to hold message for API
         private Queue<string> Messages;
+        // public event that is triggered when a message enter the queue of message
+        public event EventHandler NewMessage;
 
         /// <summary>
         /// Class constructor. Initialize all parameters (HTTP, WebSocket etc..)
@@ -65,9 +67,12 @@ namespace BackEnd.Connection
                 if (!string.IsNullOrEmpty(value))
                 {
                     Messages.Enqueue(value);
+                    NewMessage?.Invoke(this, EventArgs.Empty);
                 }
             }   
         }
+
+        
 
         /// <summary>
         /// Method that handle the user authentification. It send the information wrap in 
@@ -100,7 +105,7 @@ namespace BackEnd.Connection
                 case 30:
                     string token = response["Token"].ToString();
                     _token = token;
-                    message = "Connection successful";
+                    message = $"Connection successful, Welcome {response["Content"]}";
                     _authenticated = true;
                     _httpClient.SetHeader(_token);
                     API.API._user = new Person(response["Content"].ToString());
@@ -113,31 +118,7 @@ namespace BackEnd.Connection
             }
         }
 
-
-        //public async Task<List<Person>> GetUserData(Data pDataType)
-        //{
-        //    // Check if the HttpClient is not null
-        //    if (_httpClient is null)
-        //    {
-        //        return new List<Person>();
-        //    }
-        //    // Check if the user already has a token
-        //    if (!string.IsNullOrEmpty(_token))
-        //    {
-        //        return new List<Person>();
-        //    }
-        //    Dictionary<string, object> response = new Dictionary<string, object>();
-
-        //    switch (pDataType)
-        //    {
-        //        case Data.FRIENDS:
-        //            response = await _httpClient.UserFriends();
-        //            break;
-        //    }
-        //}
-
-        
-
+                    
         /// <summary>
         /// Private class to the Connector. His role is to handle all http communication with the server. It contains 
         /// a HttpClient object and a base Url in case something is wrong
@@ -262,12 +243,12 @@ namespace BackEnd.Connection
             }
         }
 
-        //private class Websocket
+        //private class Socket
         //{
         //    private ClientWebSocket _client;
         //    private const string BaseUrl = "ws://localhost/message";
 
-        //    public Websocket()
+        //    public Socket()
         //    {
         //        _client = new ClientWebSocket();
         //    }

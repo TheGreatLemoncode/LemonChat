@@ -43,7 +43,7 @@ def register():
         response["Content"] = usercredential['DisplayName']
         response["Code"] = 30
         return Response(json.dumps(response), status=200, mimetype="application/json", headers={'tk': token})
-    
+
     # In the case that the user is already in our database, we return
     # just a message to inform him to use the login option
     response["Content"]= "Account already exists"

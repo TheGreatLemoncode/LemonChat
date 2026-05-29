@@ -43,15 +43,15 @@ namespace LemonChat.View
             else
             {
                 await API.Connexion(txtBox_mail.Text, txtBox_Password.Text);
-                if (API.ClientStatus())
-                {
-                    ((MainWindow)Application.Current.MainWindow)._notifier.ShowSuccess($"Connexion réussi, Bienvenue{API._user}");
-                }
-                else
-                {
-                    ((MainWindow)Application.Current.MainWindow)._notifier.ShowError(API.GetMessageFromServer());
-                }
+                //if (API.ClientStatus())
+                //{
+                //    ((MainWindow)Application.Current.MainWindow)._notifier.ShowSuccess($"Connexion réussi, Bienvenue {API._user}");
+                //}
+                //else
+                //{
+                //    ((MainWindow)Application.Current.MainWindow)._notifier.ShowError(API.GetMessageFromServer());
+                //}
             }
-        }
+         }
     }
 }

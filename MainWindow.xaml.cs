@@ -44,6 +44,7 @@ namespace LemonChat
                 cfg.Dispatcher = Application.Current.Dispatcher;
             });
             API.Initialisation();
+            API.NotificationEvent += PopUpMessage;
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -69,6 +70,17 @@ namespace LemonChat
         private void LoadWelcome()
         {
             MessageBox.Show(Application.Current.MainWindow, "Welcome in LemonChat", "LemonChat");
+        }
+
+        /// <summary>
+        /// Private event type method that is called when a new 
+        /// message hit the connector from the server side
+        /// </summary>
+        /// <param name="sender">object that called the event</param>
+        /// <param name="args">Argument used to call the  event</param>
+        private void PopUpMessage(object sender, EventArgs args)
+        {
+            MessageBox.Show(API.GetMessageFromServer());
         }
 
         private bool LoadRegistration()
