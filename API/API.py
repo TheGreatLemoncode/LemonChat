@@ -3,6 +3,9 @@ from flask import Flask, request, Response
 from datetime import datetime, timedelta, timezone
 import Security
 import Bd
+import Sockets
+import threading
+import asyncio
 
 
 
@@ -75,6 +78,10 @@ def connexion():
     response = {"Content" : "Connection refused", "Code" : 35}
     return Response(json.dumps(response), 200, mimetype="application/json")
 
+def flask_run():
+    app.run("0.0.0.0",port=50000, threaded=True, debug=False)
 
 if __name__ == "__main__":
-    app.run("0.0.0.0",port=50000, threaded=True, debug=True)
+    flask_thread = threading.Thread(target=flask_run,daemon=True)
+    flask_thread.start()
+    asyncio.run(Sockets.run_server())
