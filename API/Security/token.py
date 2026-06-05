@@ -18,12 +18,7 @@ def decrypt_token(user_token: str, service : str):
     Verify the given jwt token as string and check if it's for the given 
     audience. return the decoded payload or raise an execption
     """
-    try:
-        decode = jwt.decode(user_token, SECRET_KEY, algorithms=["HS256"]
-                            , audience= service, issuer="API.me")
-        print(f"the payload incripted was : \n{decode}")
-        return decode
-    except InvalidAudienceError:
-        return "this token was not created for this service / audience"
-    except InvalidIssuerError:
-        return "this token was not created by this server"
+    decode = jwt.decode(user_token, SECRET_KEY, algorithms=["HS256"]
+                            , audience= service, issuer="API.me")   
+    print(f"the payload incripted was : \n{decode}")
+    return decode

@@ -81,5 +81,15 @@ namespace BackEnd.API
         {
             NotificationEvent?.Invoke(sender, args);
         }
+
+        public async static Task<bool> socket_connection()
+        {
+            return await Connection.OpenSocket();
+        }
+
+        public async static Task<bool> send_message(string message)
+        {
+            return await Connection.SendMessage(message);
+        }
     }
 }

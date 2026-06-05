@@ -47,6 +47,7 @@ namespace LemonChat.View
                 if (API.ClientStatus())
                 {
                     ((MainWindow)Application.Current.MainWindow)._notifier.ShowSuccess($"Connexion réussi, Bienvenue {API._user}");
+                    ((MainWindow)Application.Current.MainWindow).load_messager();
                 }
                 else
                 {

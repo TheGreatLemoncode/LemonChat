@@ -90,12 +90,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\EchoViewModel.cs" />
     <Compile Include="ViewModels\FriendsViewModels.cs" />
     <Compile Include="View\AccountCreation.xaml.cs">
       <DependentUpon>AccountCreation.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Connexion.xaml.cs">
       <DependentUpon>Connexion.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\EchoView.xaml.cs">
+      <DependentUpon>EchoView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -114,6 +118,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Connexion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\EchoView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

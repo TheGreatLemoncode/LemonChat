@@ -1,11 +1,9 @@
 import json
 from flask import Flask, request, Response
 from datetime import datetime, timedelta, timezone
-import Security
+import Security, Sockets
 import Bd
-import Sockets
 import threading
-import asyncio
 
 
 
@@ -84,4 +82,4 @@ def flask_run():
 if __name__ == "__main__":
     flask_thread = threading.Thread(target=flask_run,daemon=True)
     flask_thread.start()
-    asyncio.run(Sockets.run_server())
+    Sockets.run_server()

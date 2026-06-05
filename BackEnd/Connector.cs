@@ -7,13 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using static System.Net.WebRequestMethods;
+using System.Runtime.InteropServices;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace BackEnd.Connection
 {
@@ -24,6 +26,8 @@ namespace BackEnd.Connection
     {
         // private instance of the HTTP class that handle all http related request
         private HTTP _httpClient;
+        // private instance of the websocket handler class 
+        private SocketHandler _socket;
         // private jwt token sent by the server after authentification (HTTP handshake)
         private string _token;
         // private bool that indicated if the initial hand check with the server happened and
@@ -103,12 +107,13 @@ namespace BackEnd.Connection
             switch (code)
             {
                 case 30:
-                    string token = response["Token"].ToString();
+                    string token = ((string[])response["Token"])[0];
                     _token = token;
                     message = $"Connection successful, Welcome {response["Content"]}";
                     _authenticated = true;
                     _httpClient.SetHeader(_token);
                     API.API._user = new Person(response["Content"].ToString());
+                    _socket = new SocketHandler(_token);
                     break;
                 case 35:
                     _authenticated = false;
@@ -116,6 +121,24 @@ namespace BackEnd.Connection
                     break;
                 
             }
+        }
+
+        public async Task<bool> OpenSocket()
+        {
+            if(_socket != null)
+            {
+                return await _socket.OpenConnection();
+            }
+            return false;
+        }
+
+        public async Task<bool> SendMessage(string message)
+        {
+            if (_socket != null)
+            {
+                return await _socket.SendMessage(message);
+            }
+            return false;
         }
 
                     
@@ -243,21 +266,53 @@ namespace BackEnd.Connection
             }
         }
 
-        //private class Socket
-        //{
-        //    private ClientWebSocket _client;
-        //    private const string BaseUrl = "ws://localhost/message";
+        private class SocketHandler
+        {
+            private ClientWebSocket _client;
+            private const string BaseUrl = "ws://localhost:8090";
+            private readonly string _token;
 
-        //    public Socket()
-        //    {
-        //        _client = new ClientWebSocket();
-        //    }
+            public SocketHandler(string token)
+            {
+                _client = new ClientWebSocket();
+                _token = token;
+            }
 
-        //    public async Task<bool> OpenConnection()
-        //    {
-        //        await _client.ConnectAsync(new Uri(BaseUrl), CancellationToken.None);
-        //        _client.Options.
-        //    }
-        //}
+            public async Task<bool> SendMessage(string message)
+            {
+                ArraySegment<byte> data = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
+                try
+                {
+                    await _client.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
+                    return true;
+                }
+                catch (WebSocketException ex)
+                {
+                    return false;
+                }
+
+            }
+
+            public async Task<bool> OpenConnection()
+            {
+                int tries = 0;
+                _client.Options.SetRequestHeader("X-token-socket", _token);
+                while (_client.State != WebSocketState.Open && tries != 2)
+                {
+                    await _client.ConnectAsync(new Uri(BaseUrl), CancellationToken.None);
+                    tries++;
+                }
+                ArraySegment<byte> buff = new ArraySegment<byte>(new byte[1024 * 4]);
+                WebSocketReceiveResult response;
+                do
+                {
+                    response = await _client.ReceiveAsync(buff, CancellationToken.None);
+                }
+                while (!response.EndOfMessage);
+                string text_response = Encoding.UTF8.GetString(buff.Array, 0, response.Count);
+                return text_response == "welcome";
+
+            }
+        }
     }
 }

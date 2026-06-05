@@ -72,6 +72,11 @@ namespace LemonChat
             MessageBox.Show(Application.Current.MainWindow, "Welcome in LemonChat", "LemonChat");
         }
 
+        public void load_messager()
+        {
+            Display.Content = new View.EchoView();
+        }
+
         /// <summary>
         /// Private event type method that is called when a new 
         /// message hit the connector from the server side
