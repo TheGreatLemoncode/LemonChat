@@ -72,7 +72,7 @@ def connexion():
         response = {"Content" : user['mail'], "Code" : 30}
         return Response(json.dumps(response), 200,
                         mimetype="application/json", headers={'tk' : token})
-    response = {"Content" : "Connexion refused", "Code" : 35}
+    response = {"Content" : "Connection refused", "Code" : 35}
     return Response(json.dumps(response), 200, mimetype="application/json")
 
 
